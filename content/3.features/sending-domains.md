@@ -29,7 +29,7 @@ When you add a domain you must prove that you control it. Global administrators 
 
 **E-Mail** - Postal sends a 6 digit code to one of `webmaster@`, `postmaster@`, `admin@`, `administrator@` or `hostmaster@` at the domain (or any of its parent domains). Enter the code to complete verification. This requires the `smtp` section of Postal's configuration to be working.
 
-Unverified domains cannot be used for sending, in routes, or for tracking domains.
+Until a domain is verified it cannot be used: messages from addresses on it are rejected at submission, and it is not offered when creating routes or tracking domains.
 
 ## DNS checks
 
@@ -100,14 +100,3 @@ MX records are only needed if you want to **receive** mail for the domain throug
 ### Overall status and notifications
 
 A domain is considered fully configured when SPF and DKIM are `OK` and both MX and Return Path are either `OK` or `Missing`. If an automatic hourly check finds a **server-level** domain in any other state, a [`DomainDNSError` webhook](/developer/webhooks#dns-error-event) is triggered. Domains with problems are also highlighted at the top of the server's pages.
-
-## Sending from any domain
-
-A server-level domain can be flagged so that the server may send from **any** `From` address once the normal checks have failed. This is intended for trusted internal systems and is shown with an **Any** label in the domain list. There is no interface for setting this flag; an administrator can set it from `postal console`:
-
-```ruby
-org = Organization.find_by(permalink: "my-org")
-org.servers.find_by(permalink: "my-server").domains.find_by(name: "yourdomain.com").update(use_for_any: true)
-```
-
-Messages sent this way are signed with that domain's DKIM key.

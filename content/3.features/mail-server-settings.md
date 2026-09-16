@@ -18,7 +18,7 @@ Each mail server within an organization has its own settings, found under **Sett
 
 ### Live and Development mode
 
-In **Live** mode all mail is routed normally. In **Development** mode every outgoing and incoming message is placed in the held queue with the note "Server is in development mode." instead of being delivered to recipients or endpoints. Messages are still parsed, inspected and visible in the web interface, and count towards the server's send limit. Individual held messages can be released manually from the web interface, which delivers them despite the mode.
+In **Live** mode all mail is routed normally. In **Development** mode every outgoing and incoming message is placed in the held queue instead of being delivered to recipients or endpoints. Messages are still parsed, inspected and visible in the web interface, and count towards the server's send limit. Individual held messages can be released manually from the web interface, which delivers them despite the mode.
 
 If you only want to hold messages from a particular application or environment rather than the whole server, set the **hold** option on that application's [credential](/features/smtp-authentication#holding-messages-from-a-credential) instead.
 
@@ -43,7 +43,7 @@ Leaving any of these blank disables that limit ("Indefinitely" / "No limit"). Th
 A global administrator can set a **Send limit** for a server under **Advanced Settings**. This is the maximum number of outgoing messages accepted in a rolling 60 minute window; the current usage is shown on the **Send Limit** page. Incoming messages are counted but not limited.
 
 * When the volume reaches **90%** of the limit, the server is marked as *approaching* its limit.
-* When the volume reaches the limit, every further outgoing message is held with the note "Message held because send limit (N) has been reached." until the volume drops. Releasing a held message while the server is still over the limit holds it again.
+* When the volume reaches the limit, every further outgoing message is held until the volume drops. Releasing a held message while the server is still over the limit holds it again.
 
 Once a minute Postal checks for servers that have recently approached or exceeded their limit and, at most once per hour for each state, e-mails every user in the organization and triggers the `SendLimitApproaching` / `SendLimitExceeded` [webhook events](/developer/webhooks#send-limit-events). The e-mails are sent using the `smtp` section of your Postal configuration.
 
@@ -51,17 +51,17 @@ Once a minute Postal checks for servers that have recently approached or exceede
 
 Messages that are held are not delivered but remain visible under **Messages &rarr; Held** where they can be released (re-queued for delivery) or the hold cancelled. Each held message triggers a `MessageHeld` webhook. A message may be held for any of the following reasons:
 
-| Reason | Details recorded | Can be released manually? |
-|---|---|---|
-| Server is in Development mode | "Server is in development mode." | Yes |
-| Credential is set to hold | "Credential is configured to hold all messages authenticated by it." | Yes |
-| Recipient is on the suppression list | "Recipient (…) is on the suppression list (reason: …)" | Yes |
-| Send limit reached | "Message held because send limit (…) has been reached." | Only once the volume has dropped below the limit |
-| Server or organization is suspended | "Mail server has been suspended…" | No - it will be held again until unsuspended |
-| Incoming spam on a route set to Quarantine | "Message placed into quarantine." | Yes |
-| Incoming mail on a route set to Hold | "Message has been accepted but not sent to any endpoints." | Yes (marked as Processed) |
+| Reason | Can be released manually? |
+|---|---|
+| Server is in Development mode | Yes |
+| Credential is set to hold | Yes |
+| Recipient is on the suppression list | Yes |
+| Send limit reached | Only once the volume has dropped below the limit |
+| Server is suspended | No - it will be held again until unsuspended |
+| Incoming spam on a route set to Quarantine | Yes |
+| Incoming mail on a route set to Hold | Yes (marked as Processed) |
 
-Held messages expire after the number of days set by `postal.default_maximum_hold_expiry_days` (default **7**). An hourly task cancels the hold on expired messages, recording a `HoldCancelled` delivery with the note "The hold on this message has been removed without action." The message is not delivered.
+Held messages expire after the number of days set by `postal.default_maximum_hold_expiry_days` (default **7**). An hourly task cancels the hold on expired messages, recording a `HoldCancelled` delivery. The message is not delivered.
 
 ## Suppression list
 
@@ -94,7 +94,7 @@ An administrator can **suspend** a server from **Advanced Settings** by entering
 * API requests using the server's credentials return the `ServerSuspended` error.
 * All users in the organization are e-mailed about the suspension.
 
-Organizations also carry a suspension flag which suspends all of their servers at once; there is no interface for this, but it can be set from `postal console` (`Organization.find_by(permalink: "my-org").update(suspended_at: Time.now)`). Use **Unsuspend server** to restore normal operation; held messages must then be released manually.
+Use **Unsuspend server** to restore normal operation; held messages must then be released manually.
 
 ## Deleting a server
 

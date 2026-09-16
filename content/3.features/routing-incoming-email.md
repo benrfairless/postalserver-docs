@@ -77,7 +77,7 @@ Forward the message to another SMTP server.
 | **SSL mode** | `None` - never use TLS. `Auto` - use STARTTLS if the server offers it, without verifying the certificate, falling back to plain text if the TLS handshake fails. `TLS` - connect with implicit TLS (e.g. port 465) and verify the certificate. `STARTTLS` - see the note below. |
 
 ::callout{icon="i-heroicons-exclamation-triangle" color="amber"}
-In Postal 3.3.7 the <code>STARTTLS</code> option on SMTP endpoints does not work as intended due to a mismatch in the source code (the endpoint stores <code>STARTTLS</code> but the SMTP client checks for <code>STARTLS</code>), so it currently behaves the same as <code>None</code>. Use <code>Auto</code> or <code>TLS</code> until this is fixed.
+In Postal 3.3.7 the <code>STARTTLS</code> option on SMTP endpoints does not work as intended due to a typo in the source code, so it currently behaves the same as <code>None</code>. Use <code>Auto</code> or <code>TLS</code> until this is fixed.
 ::
 
 The message is forwarded with an envelope sender of `{server token}@{return path domain}` so that bounces come back to Postal, and a `Resent-Sender` header is added if `postal.use_resent_sender_header` is enabled. Connection timeouts are controlled by `smtp_client.open_timeout` and `smtp_client.read_timeout` (default 30 seconds each). Temporary (`4xx`) responses are retried; permanent (`5xx`) responses hard fail and cause a bounce.

@@ -38,6 +38,5 @@ Users are added to organizations by an administrator from the **Users** page: ed
 * Users log in with their e-mail address and password. Passwords must be at least 8 characters long.
 * Password resets are available from the login page and are sent using the `smtp` section of the Postal configuration, so make sure that is set up (you can test it with `postal test-app-smtp`).
 * From **My Settings** a user can change their name, e-mail address, time zone and (after confirming their current password) their password. Times throughout the interface are shown in the user's time zone, which defaults to UTC.
-* After logging in you are asked whether you would like to stay logged in. Choosing **Remember me** keeps the session alive across browser restarts; otherwise it ends when the browser is closed.
 
 If [OpenID Connect](/features/oidc) is enabled, users can be created without a password and are linked to their identity provider account on first login. Local logins can be disabled entirely with `oidc.local_authentication_enabled: false`.
